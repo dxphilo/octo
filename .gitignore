@@ -1,0 +1,23 @@
+# FastAPI specific files
+__pycache__/
+/.mypy_cache/
+/.pytest_cache/
+
+# Environment and virtual environment files
+.env
+venv/
+env/
+
+# Editor and IDE files
+.vscode/
+.idea/
+
+# Build and packaging files
+/dist/
+/build/
+*.egg-info/
+*.egg
+*.whl
+
+# Miscellaneous
+.DS_Store
