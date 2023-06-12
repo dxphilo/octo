@@ -25,7 +25,7 @@ DiveHQ backend-internship-task
 
 ```shell
     git clone https://github.com/dxphilo/octo.git
-``
+```
 
 Install the required dependencies.
 
