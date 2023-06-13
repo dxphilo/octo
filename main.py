@@ -1,54 +1,10 @@
 from fastapi import FastAPI, status
-from pydantic import BaseModel;
-from typing import Optional
-from database import SessionLocal
-import models
+from database.database import SessionLocal
+from models.models import User, ResUser, Login,Entry, ResEntry, NewEntry, NewUser
 from datetime import datetime
 
+
 app=FastAPI()
-
-class User(BaseModel): #serializer
-    fullname: str
-    email: str
-    password: str
-
-    class Config:
-        orm_mode=True
-
-class ResUser(BaseModel): #serializer
-    id:int
-    fullname: str
-    email: str
-    password: str
-    date:str
-    time:str
-
-    class Config:
-        orm_mode=True
-
-class Login(BaseModel): #serializer
-    email: str
-    password: str
-
-    class Config:
-        orm_mode=True
-
-class Entry(BaseModel): #serializer
-    text: str
-    number_of_calories: int
-
-    class Config:
-        orm_mode=True
-
-class   ResEntry(BaseModel): #serializer
-    id:int
-    text: str
-    number_of_calories: int
-    date:str
-    time:str
-
-    class Config:
-        orm_mode=True
 
 db=SessionLocal()
 
@@ -57,14 +13,19 @@ def greet():
     return {"Message": "Server is up and running"}
 
 
-@app.get('/users/',response_model=list[ResUser],status_code=200)
+from typing import List
+
+@app.get('/users/', response_model=List[ResUser], status_code=200)
 async def login_a_user():
-    users = db.query(models.User).all()
+
+    users = db.query(User).all()
+
     return users
 
-@app.post('/signup/',response_model=User, status_code=status.HTTP_201_CREATED)
-async def create_a_user(user: User):
-    new_user = models.User(
+
+@app.post('/signup/',response_model=ResUser, status_code=status.HTTP_201_CREATED)
+async def create_a_user(user: NewUser):
+    new_user = User(
         fullname=user.fullname,
         email=user.email,
         password=user.password,
@@ -84,10 +45,10 @@ async def login_a_user(login: Login):
 
 
 
-@app.post('/user/entries/',response_model=Entry, status_code=status.HTTP_201_CREATED)
-async def save_entries(entry: Entry):
+@app.post('/user/entries/',response_model=ResEntry,status_code=status.HTTP_201_CREATED)
+async def save_entries(entry: NewEntry):
 
-    new_entry = models.Entry(
+    new_entry = Entry(
         text= entry.text,
         number_of_calories=entry.number_of_calories,
         date=datetime.now().strftime("%Y-%m-%d"),
@@ -99,13 +60,13 @@ async def save_entries(entry: Entry):
 
     return new_entry
 
-@app.get('/user/entries/')
+@app.get('/user/entries/',response_model=List[ResEntry],status_code=status.HTTP_200_OK)
 async def get_entries():
-    all_entries = db.query(models.Entry).all()
+    all_entries = db.query(Entry).all()
     return all_entries
 
 @app.put('/user/entries/{user_id}')
-async def update_entries(user_id: int, user: User):
+async def update_entries(user_id: int, user: NewUser):
     return {"user_email":f"Hello {user_id}, {user}"}
 
 
