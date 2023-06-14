@@ -53,8 +53,8 @@ Create a file named .env in the root directory of your project.
 
 ```shell
     PORT="8000"
-    NUTRITIONIX_API_ID="3bf47314"
-    NUTRITIONIX_API_KEY="d1df8c13ae558418a46d7335f4c3e49c"
+    NUTRITIONIX_API_ID="your-api-id here"
+    NUTRITIONIX_API_KEY="your-api-key-here"
     NUTRITIONIX_URL="https://trackapi.nutritionix.com/v2/search/item?nix_item_id=513fc9e73fe3ffd40300109f"
 ```
 Replace your_api_id and your_api_key with the actual values obtained from [https://www.nutritionix.com/](https://www.nutritionix.com/).
