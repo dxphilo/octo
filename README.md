@@ -44,6 +44,25 @@ Run the application.
     uvicorn main:app --reload
 ```
 
+ENV Setup
+
+Create a file named .env in the root directory of your project.
+1. Open the .env file in a text editor.
+
+2. Add the following lines to the .env file:
+
+```shell
+    PORT="8000"
+    NUTRITIONIX_API_ID="3bf47314"
+    NUTRITIONIX_API_KEY="d1df8c13ae558418a46d7335f4c3e49c"
+    NUTRITIONIX_URL="https://trackapi.nutritionix.com/v2/search/item?nix_item_id=513fc9e73fe3ffd40300109f"
+```
+Replace your_api_id and your_api_key with the actual values obtained from [https://www.nutritionix.com/](https://www.nutritionix.com/).
+
+Make sure to save the .env file in the same directory as your Python files.
+
+
+
 Usage
 
 Open the API documentation in your browser by visiting http://localhost:8000/docs.
