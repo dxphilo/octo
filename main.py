@@ -1,6 +1,7 @@
 from fastapi import FastAPI, status,HTTPException
 from database.database import SessionLocal
-from models.models import User, ResUser, Login,Entry, ResEntry, NewEntry, NewUser
+from models.models import User, Entry
+from schema.schema import  ResEntry, NewEntry, NewUser, ResUser, Login
 from datetime import datetime
 from typing import List
 from functools import lru_cache
@@ -64,6 +65,7 @@ async def save_entries(entry: NewEntry):
     "x-app-key": settings.NUTRITIONIX_API_KEY
     }
     url = settings.NUTRITIONIX_URL
+    expected_calories_per_day = settings.EXPECTED_CALORIES_PER_DAY
 
     if entry.number_of_calories is None:
         async with httpx.AsyncClient() as client:
@@ -80,7 +82,11 @@ async def save_entries(entry: NewEntry):
         number_of_calories=entry.number_of_calories,
         date=datetime.now().strftime("%Y-%m-%d"),
         time=datetime.now().strftime("%H:%M:%S"),
+        is_under_calories=False
     )
+     # Check the threshhold for the total nunber of calories for the day
+    if entry.number_of_calories is not None and int(entry.number_of_calories) < int(expected_calories_per_day):
+        new_entry.is_under_calories = True
 
     db.add(new_entry)
     db.commit()

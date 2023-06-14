@@ -1,9 +1,5 @@
 from sqlalchemy import String,Boolean,Integer,Column,Text
-from pydantic import BaseModel
-from typing import Optional
-from sqlalchemy.ext.declarative import declarative_base
-
-Base = declarative_base()
+from database.database import Base
 
 class User(Base):
     __tablename__='users'
@@ -21,48 +17,4 @@ class Entry(Base):
     number_of_calories=Column(Text,nullable=False)
     date=Column(String(255),nullable=False)
     time=Column(String(244),nullable=False)
-
-
-class NewUser(BaseModel):
-    fullname: str
-    email: str
-    password: str
-
-    class Config:
-        orm_mode = True
-
-class ResUser(BaseModel):
-    id: int
-    fullname: str
-    email: str
-    password: str
-    date: str
-    time: str
-
-    class Config:
-        orm_mode = True
-
-class Login(BaseModel):
-    email: str
-    password: str
-
-    class Config:
-        orm_mode = True
-
-class NewEntry(BaseModel):
-    text: str
-    number_of_calories: Optional[int]
-
-    class Config:
-        orm_mode = True
-
-class ResEntry(BaseModel):
-    id: int
-    date:str
-    number_of_calories: str
-    text: str
-    time:str
-
-    class Config:
-        orm_mode = True
-
+    is_under_calories=Column(Boolean,nullable=False)

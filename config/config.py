@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     NUTRITIONIX_API_ID: str
     NUTRITIONIX_API_KEY: str
     NUTRITIONIX_URL: str
+    EXPECTED_CALORIES_PER_DAY: str
     
     class Config:
         env_file = ".env"

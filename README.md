@@ -56,6 +56,7 @@ Create a file named .env in the root directory of your project.
     NUTRITIONIX_API_ID="your-api-id here"
     NUTRITIONIX_API_KEY="your-api-key-here"
     NUTRITIONIX_URL="https://trackapi.nutritionix.com/v2/search/item?nix_item_id=513fc9e73fe3ffd40300109f"
+    EXPECTED_CALORIES_PER_DAY= 2000 // change this to your expected calories per day
 ```
 Replace your_api_id and your_api_key with the actual values obtained from [https://www.nutritionix.com/](https://www.nutritionix.com/).
 
