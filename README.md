@@ -79,7 +79,7 @@ Testing
 Run unit tests.
 
 ```shell
-    python manage.py test
+    pytest
 ```
 
 ```shell
