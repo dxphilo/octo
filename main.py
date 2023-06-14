@@ -3,12 +3,20 @@ from database.database import SessionLocal
 from models.models import User, ResUser, Login,Entry, ResEntry, NewEntry, NewUser
 from datetime import datetime
 from typing import List
-
+from functools import lru_cache
+from . import config;
+import httpx
 
 app=FastAPI()
 
 db=SessionLocal()
 
+
+@lru_cache()
+def get_settings():
+    return config.Settings()
+
+settings = get_settings()
 
 @app.get('/')
 def health_check():
@@ -49,6 +57,21 @@ async def login_a_user(login: Login):
 
 @app.post('/user/entries/',response_model=ResEntry,status_code=status.HTTP_201_CREATED)
 async def save_entries(entry: NewEntry):
+
+    number_of_calories: int=0;
+
+    headers = {
+    "Content-Type": "application/json",
+    "x-app-id": settings.NUTRITIONIX_API_ID,
+    "x-app-key": settings.NUTRITIONIX_API_KEY
+    }
+    url = settings.NUTRITIONIX_URL
+
+    if entry.number_of_calories is None:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url,headers=headers)
+            print(response);
+
 
     new_entry = Entry(
         text= entry.text,

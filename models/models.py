@@ -1,6 +1,6 @@
 from sqlalchemy import String,Boolean,Integer,Column,Text
 from pydantic import BaseModel
-from typing import List
+from typing import Optional
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -51,7 +51,7 @@ class Login(BaseModel):
 
 class NewEntry(BaseModel):
     text: str
-    number_of_calories: int
+    number_of_calories: Optional[int]
 
     class Config:
         orm_mode = True
