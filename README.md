@@ -35,13 +35,13 @@ Install the required dependencies.
 Set up the database.
 
 ```shell
-    python manage.py migrate
+    python create_db.py
 ```
 
 Run the application.
 
 ```shell
-    python manage.py runserver
+    uvicorn main:app --reload
 ```
 
 Usage

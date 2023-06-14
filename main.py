@@ -1,4 +1,4 @@
-from fastapi import FastAPI, status
+from fastapi import FastAPI, status,HTTPException
 from database.database import SessionLocal
 from models.models import User, ResUser, Login,Entry, ResEntry, NewEntry, NewUser
 from datetime import datetime
@@ -33,6 +33,12 @@ async def create_a_user(user: NewUser):
         time=datetime.now().strftime("%H:%M:%S"),
     )
     # TODO: ensure return approaprita error message when email is not unique;
+
+    db_item=db.query(User).filter(user.email == new_user.email).first()
+
+    if db_item is not None:
+        raise HTTPException(status_code=400,detail="User with the email already exists")
+    
     db.add(new_user)
     db.commit()
 
@@ -65,11 +71,24 @@ async def get_entries():
     all_entries = db.query(Entry).all()
     return all_entries
 
-@app.put('/user/entries/{user_id}')
-async def update_entries(user_id: int, user: NewUser):
-    return {"user_email":f"Hello {user_id}, {user}"}
+@app.put('/user/entries/{entry_id}/',response_model=ResEntry,status_code=status.HTTP_200_OK)
+async def update_entries(entry_id: int, entry: ResEntry):
+
+    entry_to_update = db.query(Entry).filter(Entry.id == entry_id).first()
+
+    if entry_to_update is None:
+        raise HTTPException(status_code=400, detail=f"Entry with the id {entry_id} is not found")
+
+    entry_to_update.text = entry.text
+    entry_to_update.number_of_calories = entry.number_of_calories
+    entry_to_update.date = datetime.now().strftime("%Y-%m-%d")
+    entry_to_update.time = datetime.now().strftime("%H:%M:%S")
+
+    db.commit()
+
+    return entry_to_update
 
 
-@app.delete('/user/entries/{user_id}')
-async def delete_an_entry(user_id: int):
-    return {"user_email":f"Hello {user_id}"}
+@app.delete('/user/entries/{entry_id}')
+async def delete_an_entry(entry_id: int):
+    return {"user_email":f"Hello {entry_id}"}
