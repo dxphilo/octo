@@ -2,24 +2,21 @@ from fastapi import FastAPI, status,HTTPException
 from database.database import SessionLocal
 from models.models import User, ResUser, Login,Entry, ResEntry, NewEntry, NewUser
 from datetime import datetime
+from typing import List
 
 
 app=FastAPI()
 
 db=SessionLocal()
 
+
 @app.get('/')
-def greet():
+def health_check():
     return {"Message": "Server is up and running"}
-
-
-from typing import List
 
 @app.get('/users/', response_model=List[ResUser], status_code=200)
 async def login_a_user():
-
     users = db.query(User).all()
-
     return users
 
 
@@ -32,7 +29,6 @@ async def create_a_user(user: NewUser):
         date=datetime.now().strftime("%Y-%m-%d"),
         time=datetime.now().strftime("%H:%M:%S"),
     )
-    # TODO: ensure return approaprita error message when email is not unique;
 
     db_item=db.query(User).filter(user.email == new_user.email).first()
 
@@ -89,6 +85,14 @@ async def update_entries(entry_id: int, entry: ResEntry):
     return entry_to_update
 
 
-@app.delete('/user/entries/{entry_id}')
+@app.delete('/user/entries/{entry_id}/', response_model=ResEntry,status_code=status.HTTP_200_OK)
 async def delete_an_entry(entry_id: int):
-    return {"user_email":f"Hello {entry_id}"}
+    entry_to_delete = db.query(Entry).filter(Entry.id == entry_id).first()
+    # TODO: authenticate user deletion
+
+    if entry_to_delete is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Entry with the given id {entry_id} is not found")
+    
+    db.delete(entry_to_delete)
+    db.commit()
+    return entry_to_delete
