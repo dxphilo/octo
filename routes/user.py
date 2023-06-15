@@ -7,6 +7,7 @@ from datetime import datetime
 from auth.auth import sign_jwt
 from typing import List
 from .entry import get_user_from_token
+from utils.helpers import hash_password, verify_hashed_password
 
 db=SessionLocal()
 router = APIRouter()
@@ -15,10 +16,11 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 
 @router.post('/signup/',response_model=ResUser, status_code=status.HTTP_201_CREATED)
 async def create_a_user(user: NewUser):
+    hashed_password = await hash_password(user.password)
     new_user = User(
         fullname=user.fullname,
         email=user.email,
-        password=user.password,
+        password= hashed_password,
         role=user.role,
         date=datetime.now().strftime("%Y-%m-%d"),
         time=datetime.now().strftime("%H:%M:%S"),
@@ -40,12 +42,17 @@ async def login_a_user(login: Login):
     db_user = db.query(User).filter(User.email == login.email).first() 
 
     if db_user is not None:
-        if db_user.password != login.password:
+        try:
+            is_password_valid = await verify_hashed_password(login.password,db_user.password)
+        except Exception:
+                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="You have entered a wrong password")
+        if is_password_valid:
+            token = sign_jwt(db_user)
+            return token
+        else:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="You have entered a wrong password")
-        token = sign_jwt(db_user)
-        return token
     
-    return { "msg": "User not found in the database"}
+    raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = "User not found in the database")
 
 
 @router.get('/users/',response_model=List[ResUser] ,status_code=200)
