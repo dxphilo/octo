@@ -10,9 +10,3 @@ app.include_router(user_routes)
 @app.get('/health')
 async def health_check():
     return {'status':'ok 👍 '}
-
-
-
-
-
-

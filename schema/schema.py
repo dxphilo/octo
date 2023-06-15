@@ -30,9 +30,10 @@ class ResUser(BaseModel):
     fullname: str
     email: str
     password: str
+    role: Role
     date: str
     time: str
-    role: Role
+ 
 
     class Config:
         orm_mode = True
