@@ -82,10 +82,6 @@ Run unit tests.
     pytest
 ```
 
-```shell
-    python manage.py e2e_test
-```
-
 Contributing
 
 Contributions are welcome! If you encounter any issues or have suggestions for improvement, please create an issue or submit a pull request.

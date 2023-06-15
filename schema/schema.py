@@ -1,11 +1,26 @@
 from pydantic import BaseModel
 from typing import Optional
+from enum import Enum
+from dataclasses import dataclass
+
+
+class Role(str,Enum):
+    USER = "user"
+    MANAGER = "manager"
+    ADMIN = "admin"
+
+@dataclass
+class SignUser:
+    fullname: str
+    email: str
+    role: Role
 
 
 class NewUser(BaseModel):
     fullname: str
     email: str
     password: str
+    role:Role
 
     class Config:
         orm_mode = True
@@ -17,9 +32,11 @@ class ResUser(BaseModel):
     password: str
     date: str
     time: str
+    role: Role
 
     class Config:
         orm_mode = True
+
 
 class Login(BaseModel):
     email: str
@@ -41,7 +58,8 @@ class ResEntry(BaseModel):
     number_of_calories: str
     text: str
     time:str
-    is_under_calories: bool 
+    is_under_calories: bool
+    user:str
 
     class Config:
         orm_mode = True
