@@ -1,5 +1,6 @@
-from sqlalchemy import String,Boolean,Integer,Column,Text
+from sqlalchemy import String,Boolean,Integer,Column,Text, Enum
 from database.database import Base
+from schema.schema import Role
 
 class User(Base):
     __tablename__='users'
@@ -9,6 +10,7 @@ class User(Base):
     password=Column(String(255),nullable=False)
     date=Column(String(255),nullable=False)
     time=Column(String(244),nullable=False)
+    role=Column(Enum(Role))
 
 class Entry(Base):
     __tablename__='entries'

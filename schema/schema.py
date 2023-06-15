@@ -1,11 +1,19 @@
 from pydantic import BaseModel
 from typing import Optional
+from enum import Enum
+
+
+class Role(Enum):
+    USER = "user"
+    MANAGER = "manager"
+    ADMIN = "admin"
 
 
 class NewUser(BaseModel):
     fullname: str
     email: str
     password: str
+    role:Role
 
     class Config:
         orm_mode = True
@@ -17,6 +25,7 @@ class ResUser(BaseModel):
     password: str
     date: str
     time: str
+    role: Role
 
     class Config:
         orm_mode = True

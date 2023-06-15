@@ -4,19 +4,12 @@ from models.models import User, Entry
 from schema.schema import  ResEntry, NewEntry, NewUser, ResUser, Login
 from datetime import datetime
 from typing import List
-from functools import lru_cache
-from config.config import Settings
+from config.config import settings
 import httpx
+from auth.auth import sign_jwt,decode_jwt
 
 db=SessionLocal()
 router = APIRouter()
-
-@lru_cache()
-def get_settings():
-    return Settings()
-
-settings = get_settings()
-
 
 @router.get('/')
 def health_check():
@@ -36,11 +29,12 @@ async def create_a_user(user: NewUser):
         fullname=user.fullname,
         email=user.email,
         password=user.password,
+        role=user.role,
         date=datetime.now().strftime("%Y-%m-%d"),
         time=datetime.now().strftime("%H:%M:%S"),
     )
 
-    db_item=db.query(User).filter(user.email == new_user.email).first()
+    db_item=db.query(User).filter(User.email == new_user.email).first()
 
     if db_item is not None:
         raise HTTPException(status_code=400,detail="User with the email already exists")
@@ -53,7 +47,15 @@ async def create_a_user(user: NewUser):
 
 @router.post('/login/')
 async def login_a_user(login: Login):
-    return login
+    db_user = db.query(User).filter(User.email == login.email).first()
+
+    if db_user is not None:
+        if db_user.password != login.password:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="You have entered a wrong password")
+        token = sign_jwt(db_user)
+        return token
+    
+    return { "msg": "User not found in the database"}
 
 
 
