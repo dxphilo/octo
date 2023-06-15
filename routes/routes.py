@@ -1,4 +1,5 @@
-from fastapi import status,HTTPException, APIRouter
+from fastapi import status,HTTPException, APIRouter, Depends
+from fastapi.security import OAuth2PasswordBearer
 from database.database import SessionLocal
 from models.models import User, Entry
 from schema.schema import  ResEntry, NewEntry, NewUser, ResUser, Login
@@ -10,6 +11,7 @@ from auth.auth import sign_jwt,decode_jwt
 
 db=SessionLocal()
 router = APIRouter()
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 
 @router.get('/')
 def health_check():
@@ -60,41 +62,49 @@ async def login_a_user(login: Login):
 
 
 @router.post('/user/entries/',response_model=ResEntry,status_code=status.HTTP_201_CREATED)
-async def save_entries(entry: NewEntry):
+async def save_entries(entry: NewEntry,token:str = Depends(oauth2_scheme)):
+    try:
+        user_from_token = decode_jwt(token);
 
-    headers = {
-    "Content-Type": "application/json",
-    "x-app-id": settings.NUTRITIONIX_API_ID,
-    "x-app-key": settings.NUTRITIONIX_API_KEY
-    }
-    url = settings.NUTRITIONIX_URL
-    expected_calories_per_day = settings.EXPECTED_CALORIES_PER_DAY
+        if not user_from_token:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token")
 
-    if entry.number_of_calories is None:
-        async with httpx.AsyncClient() as client:
-            response = await client.get(url,headers=headers)
-            data = response.json()
-            foods = data.get("foods",[])
-            if foods:
-                entry.number_of_calories =foods[0].get("nf_calories",0)
-            print(response)
+        headers = {
+        "Content-Type": "application/json",
+        "x-app-id": settings.NUTRITIONIX_API_ID,
+        "x-app-key": settings.NUTRITIONIX_API_KEY
+        }
+        url = settings.NUTRITIONIX_URL
+        expected_calories_per_day = settings.EXPECTED_CALORIES_PER_DAY
+
+        if entry.number_of_calories is None:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(url,headers=headers)
+                data = response.json()
+                foods = data.get("foods",[])
+                if foods:
+                    entry.number_of_calories =foods[0].get("nf_calories",0)
+                print(response)
 
 
-    new_entry = Entry(
-        text= entry.text,
-        number_of_calories=entry.number_of_calories,
-        date=datetime.now().strftime("%Y-%m-%d"),
-        time=datetime.now().strftime("%H:%M:%S"),
-        is_under_calories=False
-    )
-     # Check the threshhold for the total nunber of calories for the day
-    if entry.number_of_calories is not None and int(entry.number_of_calories) < int(expected_calories_per_day):
-        new_entry.is_under_calories = True
+        new_entry = Entry(
+            text= entry.text,
+            number_of_calories=entry.number_of_calories,
+            date=datetime.now().strftime("%Y-%m-%d"),
+            time=datetime.now().strftime("%H:%M:%S"),
+            is_under_calories=False
+        )
+        # Check the threshhold for the total nunber of calories for the day and set is_under_calories appropriately
+        if entry.number_of_calories is not None and int(entry.number_of_calories) < int(expected_calories_per_day):
+            new_entry.is_under_calories = True
 
-    db.add(new_entry)
-    db.commit()
+        db.add(new_entry)
+        db.commit()
 
-    return new_entry
+        return new_entry
+    except:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 @router.get('/user/entries/',response_model=List[ResEntry],status_code=status.HTTP_200_OK)
 async def get_entries():
