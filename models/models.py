@@ -20,3 +20,4 @@ class Entry(Base):
     date=Column(String(255),nullable=False)
     time=Column(String(244),nullable=False)
     is_under_calories=Column(Boolean,nullable=False)
+    user=Column(String(255),nullable=False)

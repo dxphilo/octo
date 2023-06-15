@@ -68,7 +68,9 @@ async def save_entries(entry: NewEntry,token:str = Depends(oauth2_scheme)):
 
         if not user_from_token:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token")
-
+        
+        user = user_from_token['user_id']
+        
         headers = {
         "Content-Type": "application/json",
         "x-app-id": settings.NUTRITIONIX_API_ID,
@@ -90,6 +92,7 @@ async def save_entries(entry: NewEntry,token:str = Depends(oauth2_scheme)):
         new_entry = Entry(
             text= entry.text,
             number_of_calories=entry.number_of_calories,
+            user=user,
             date=datetime.now().strftime("%Y-%m-%d"),
             time=datetime.now().strftime("%H:%M:%S"),
             is_under_calories=False
