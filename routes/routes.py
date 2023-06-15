@@ -47,7 +47,7 @@ async def create_a_user(user: NewUser):
 
 @router.post('/login/')
 async def login_a_user(login: Login):
-    db_user = db.query(User).filter(User.email == login.email).first()
+    db_user = db.query(User).filter(User.email == login.email).first() 
 
     if db_user is not None:
         if db_user.password != login.password:

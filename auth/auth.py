@@ -1,26 +1,14 @@
 import time
 import jwt
-from dataclasses import dataclass
 from config.config import settings
-from schema.schema import Role
+from schema.schema import SignUser
 
 JWT_SECRET = settings.JWT_SECRET
 JWT_ALGORITHM = settings.JWT_ALGORITHM
-expiration_time = time.time() + (16 * 60 * 60)  # 16 hours (60 minutes * 60 seconds)
-
-@dataclass
-class User:
-    fullname: str
-    email: str
-    role: Role
+expiration_time = time.time() + (16 * 60 * 60)  # 16 hours (60 minutes * 60 seconds) 
 
 
-def token_responce(token:str):
-    return {
-        "access_token": token
-    }
-
-def sign_jwt(user: User):
+def sign_jwt(user: SignUser):
     payload = {
         "user_id":user.fullname,
         "user_email": user.email,
@@ -28,7 +16,7 @@ def sign_jwt(user: User):
         "expires": expiration_time
     }
 
-    token = jwt.encode(payload=payload, JWT_SECRET=JWT_SECRET, algorithm=JWT_ALGORITHM)
+    token = jwt.encode(payload, JWT_SECRET,JWT_ALGORITHM)
     return token_responce(token=token)
 
 def decode_jwt(token:str) -> dict:
@@ -37,3 +25,8 @@ def decode_jwt(token:str) -> dict:
         return decoded_token if decoded_token['expires'] >= time.time() else None
     except:
         return {}
+    
+def token_responce(token:str):
+    return {
+        "access_token": token
+    }
