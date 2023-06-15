@@ -1,6 +1,5 @@
-# DiveHQ/backend-internship-task
-
-DiveHQ backend-internship-task
+# FastAPI APPLICATION 
+FastAPI
 ## Features
 
 - User Registration: Users can create an account.
