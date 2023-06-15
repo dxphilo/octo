@@ -65,3 +65,6 @@ class ResEntry(BaseModel):
     class Config:
         orm_mode = True
 
+
+class DeletionSuccess(BaseModel):
+    message: str = "User deleted successfully."

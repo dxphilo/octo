@@ -2,7 +2,7 @@ from fastapi import status,HTTPException, APIRouter,Depends
 from fastapi.security import OAuth2PasswordBearer
 from database.database import SessionLocal
 from models.models import User
-from schema.schema import  NewUser, ResUser, Login, Role
+from schema.schema import  NewUser, ResUser, Login, Role, DeletionSuccess
 from datetime import datetime
 from auth.auth import sign_jwt
 from typing import List
@@ -107,6 +107,37 @@ async def update_user_details(
     except:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+@router.delete('/users/{user_id}/', response_model=DeletionSuccess, status_code=200)
+async def delete_user_detail(
+    user_id:int,
+    token: str = Depends(oauth2_scheme)
+):
+    try:
+        user_from_token = await get_user_from_token(token)
+        role = Role(user_from_token['role'])
+        user_email = user_from_token['user_email']
+
+        user_entry_to_delete = db.query(User).filter(User.id == user_id).first()
+
+        if user_entry_to_delete is None:
+            raise HTTPException(status_code=400, detail=f"User with the id {user_id} was not found")
+        
+        if (
+            role == Role.ADMIN 
+            or (role == Role.MANAGER and user_entry_to_delete.role == Role.USER)
+            or (role == Role.USER and user_entry_to_delete.email == user_email)
+        ):
+            db.delete(user_entry_to_delete)
+            db.commit()
+
+        else:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient privileges")
+
+        return  DeletionSuccess()
+    
+    except:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="User deletion was not successfull")
 
 
 user_routes=router
