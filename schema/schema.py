@@ -48,7 +48,6 @@ class Login(BaseModel):
 class NewEntry(BaseModel):
     text: str
     number_of_calories: Optional[int]
-    user: str
 
     class Config:
         orm_mode = True

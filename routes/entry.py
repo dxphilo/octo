@@ -1,63 +1,17 @@
 from fastapi import status,HTTPException, APIRouter, Depends
 from fastapi.security import OAuth2PasswordBearer
 from database.database import SessionLocal
-from models.models import User, Entry
-from schema.schema import  ResEntry, NewEntry, NewUser, ResUser, Login, Role
+from models.models import Entry
+from schema.schema import  ResEntry, NewEntry, Role
 from datetime import datetime
 from typing import List
 from config.config import settings
 import httpx
-from auth.auth import sign_jwt,decode_jwt
+from auth.auth import decode_jwt
 
 db=SessionLocal()
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
-
-@router.get('/health')
-async def health_check():
-    return {"status": "ok 👍"}
-
-
-
-@router.get('/users/', response_model=List[ResUser], status_code=200)
-async def login_a_user():
-    users = db.query(User).all()
-    return users
-
-
-@router.post('/signup/',response_model=ResUser, status_code=status.HTTP_201_CREATED)
-async def create_a_user(user: NewUser):
-    new_user = User(
-        fullname=user.fullname,
-        email=user.email,
-        password=user.password,
-        role=user.role,
-        date=datetime.now().strftime("%Y-%m-%d"),
-        time=datetime.now().strftime("%H:%M:%S"),
-    )
-
-    db_item=db.query(User).filter(User.email == new_user.email).first()
-
-    if db_item is not None:
-        raise HTTPException(status_code=400,detail="User with the email already exists")
-    
-    db.add(new_user)
-    db.commit()
-
-    return new_user
-
-
-@router.post('/login/')
-async def login_a_user(login: Login):
-    db_user = db.query(User).filter(User.email == login.email).first() 
-
-    if db_user is not None:
-        if db_user.password != login.password:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="You have entered a wrong password")
-        token = sign_jwt(db_user)
-        return token
-    
-    return { "msg": "User not found in the database"}
 
 
 
@@ -109,6 +63,8 @@ async def save_entries(entry: NewEntry,token:str = Depends(oauth2_scheme)):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+
+
 @router.get('/user/entries/',response_model=List[ResEntry],status_code=status.HTTP_200_OK)
 async def get_entries(token:str = Depends(oauth2_scheme)):
     try:
@@ -129,6 +85,9 @@ async def get_entries(token:str = Depends(oauth2_scheme)):
         return all_entries
     except:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+
+
 
 @router.put('/user/entries/{entry_id}/',response_model=ResEntry,status_code=status.HTTP_200_OK)
 async def update_entries(entry_id: int, entry: ResEntry, token:str = Depends(oauth2_scheme)):
@@ -157,6 +116,7 @@ async def update_entries(entry_id: int, entry: ResEntry, token:str = Depends(oau
 
 
 
+
 @router.delete('/user/entries/{entry_id}/', response_model=ResEntry,status_code=status.HTTP_200_OK)
 async def delete_an_entry(entry_id: int, token:str = Depends(oauth2_scheme)):
     try:
@@ -177,3 +137,5 @@ async def delete_an_entry(entry_id: int, token:str = Depends(oauth2_scheme)):
         return entry_to_delete
     except:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+entry_routes=router
