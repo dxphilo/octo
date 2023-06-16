@@ -62,7 +62,7 @@ def test_get_users(authorization_headers):
 
 # this test will fail is the user with the id is not found in the database
 def test_update_users(authorization_headers, sample_update_payload):
-    user_id = 9
+    user_id = 9 # this could be any user id existing in the database
     response = client.patch(f'/users/{user_id}', headers=authorization_headers, json=sample_update_payload)
     assert response.status_code == 200
 
@@ -78,9 +78,9 @@ def test_update_users(authorization_headers, sample_update_payload):
         assert response_json[key] == value
 
 
-# this test will fail is the user with the id is not found in the database
+# this test will fail is the user with the user_id is not found in the database
 def test_delete_user(authorization_headers):
-    user_id = 13
+    user_id = 13 # this could be any user id existing in the database
     response = client.delete(f'/users/{user_id}', headers=authorization_headers)
     assert response.status_code == 200
     assert response.json() == {"message": "User deleted successfully."}
