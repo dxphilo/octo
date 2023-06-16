@@ -2,7 +2,7 @@ from fastapi import status,HTTPException, APIRouter,Depends
 from fastapi.security import OAuth2PasswordBearer
 from database.database import SessionLocal
 from models.models import User
-from schema.schema import  NewUser, ResUser, Login, Role, DeletionSuccess
+from schema.schema import  NewUser, ResUser, Login, Role, DeletionSuccess, ResUpdateUser
 from datetime import datetime
 from auth.auth import sign_jwt
 from typing import List
@@ -76,7 +76,7 @@ async def get_users(token: str = Depends(oauth2_scheme)):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.put('/users/{user_id}/', response_model=ResUser, status_code=200)
+@router.put('/users/{user_id}/', response_model=ResUpdateUser, status_code=200)
 async def update_user_details(
     user_id:int,
     new_entry:NewUser,

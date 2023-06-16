@@ -29,6 +29,19 @@ class ResUser(BaseModel):
     id: int
     fullname: str
     email: str
+    # password: str dont return password as a security practice
+    role: Role
+    date: str
+    time: str
+ 
+
+    class Config:
+        orm_mode = True
+
+class ResUpdateUser(BaseModel):
+    id: int
+    fullname: str
+    email: str
     password: str
     role: Role
     date: str
