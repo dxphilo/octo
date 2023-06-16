@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     EXPECTED_CALORIES_PER_DAY: str
     JWT_SECRET:str
     JWT_ALGORITHM:str
+    PORT: str
     
     class Config:
         env_file = ".env"

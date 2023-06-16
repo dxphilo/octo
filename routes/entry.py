@@ -6,12 +6,19 @@ from schema.schema import ResEntry, NewEntry, Role
 from datetime import datetime
 from typing import List
 from config.config import settings
-import httpx
+from sqlalchemy.exc import SQLAlchemyError
 from auth.auth import decode_jwt
+from utils.helpers import get_calories_from_api
 
+# Create a database session
 db = SessionLocal()
+
+# Create an API router
 router = APIRouter()
+
+# Define the OAuth2 password bearer scheme
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
+
 
 # Utility function to get user from token
 async def get_user_from_token(token: str):
@@ -20,27 +27,17 @@ async def get_user_from_token(token: str):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token")
     return user_from_token
 
+
+# Endpoint for saving entries
 @router.post('/user/entries/', response_model=ResEntry, status_code=status.HTTP_201_CREATED)
 async def save_entries(entry: NewEntry, token: str = Depends(oauth2_scheme)):
     try:
         user_from_token = await get_user_from_token(token)
         user = user_from_token['user_id']
-        headers = {
-            "Content-Type": "application/json",
-            "x-app-id": settings.NUTRITIONIX_API_ID,
-            "x-app-key": settings.NUTRITIONIX_API_KEY
-        }
-        url = settings.NUTRITIONIX_URL
-        expected_calories_per_day = settings.EXPECTED_CALORIES_PER_DAY
 
         if entry.number_of_calories is None:
-            async with httpx.AsyncClient() as client:
-                response = await client.get(url, headers=headers)
-                data = response.json()
-                foods = data.get("foods", [])
-                if foods:
-                    entry.number_of_calories = foods[0].get("nf_calories", 0)
-                print(response)
+            calories = await get_calories_from_api()
+            entry.number_of_calories = calories
 
         new_entry = Entry(
             text=entry.text,
@@ -50,17 +47,20 @@ async def save_entries(entry: NewEntry, token: str = Depends(oauth2_scheme)):
             time=datetime.now().strftime("%H:%M:%S"),
             is_under_calories=False
         )
-        if entry.number_of_calories is not None and int(entry.number_of_calories) < int(expected_calories_per_day):
+
+        if entry.number_of_calories is not None and int(entry.number_of_calories) < int(settings.EXPECTED_CALORIES_PER_DAY):
             new_entry.is_under_calories = True
 
         db.add(new_entry)
         db.commit()
 
         return new_entry
-    except:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except SQLAlchemyError:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Entry was not saved to the database")
 
 
+
+# Endpoint for retrieving entries
 @router.get('/user/entries/', response_model=List[ResEntry], status_code=status.HTTP_200_OK)
 async def get_entries(
     page: int = Query(1, ge=1),
@@ -80,10 +80,12 @@ async def get_entries(
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User with the role specified was not found")
 
         return all_entries
-    except:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except SQLAlchemyError:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error querying the database")
 
 
+
+# Endpoint for updating an entry
 @router.put('/user/entries/{entry_id}/', response_model=ResEntry, status_code=status.HTTP_200_OK)
 async def update_entries(entry_id: int, entry: ResEntry, token: str = Depends(oauth2_scheme)):
     try:
@@ -106,6 +108,8 @@ async def update_entries(entry_id: int, entry: ResEntry, token: str = Depends(oa
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+
+# Endpoint for deleting an entry
 @router.delete('/user/entries/{entry_id}/', response_model=ResEntry, status_code=status.HTTP_200_OK)
 async def delete_an_entry(entry_id: int, token: str = Depends(oauth2_scheme)):
     try:
@@ -124,4 +128,5 @@ async def delete_an_entry(entry_id: int, token: str = Depends(oauth2_scheme)):
     except:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+# Export the router
 entry_routes = router

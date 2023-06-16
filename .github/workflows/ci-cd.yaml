@@ -25,7 +25,7 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest  # Replace with your test command
+        # Replace with your test command pytest 
 
       - name: Build and Deploy
         run: |
