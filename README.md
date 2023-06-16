@@ -227,10 +227,10 @@ Send token in the form:
 
 
 
-Contributing
+## Contributing
 
 Contributions are welcome! If you encounter any issues or have suggestions for improvement, please create an issue or submit a pull request.
 
-License
+## License
 
 This project is licensed under the MIT License.

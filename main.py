@@ -19,3 +19,4 @@ if __name__ == "__main__":
 
     app_module = "main:app"
     uvicorn.run(app_module, host="0.0.0.0", port=port, reload=True)
+
