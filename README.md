@@ -20,13 +20,13 @@ FastAPI
 
 ## Installation and Setup
 
-1. Clone the repository.
+### Clone the repository.
 
 ```shell
     git clone https://github.com/dxphilo/octo.git
 ```
 
-ENV Setup
+### ENV Setup
 
 Create a file named .env in the root directory of your project.
 
@@ -35,35 +35,34 @@ Create a file named .env in the root directory of your project.
 ```
 
 
-Install the required dependencies.
+### Install the required dependencies.
 
 ```shell
     pip install -r requirements.txt
 ```
-Set up the database with sqlite.
+### Set up the database with sqlite.
 
 ```shell
     python create_db.py
 ```
 
-Run the application.
+### Run the application.
+
+Application will be exposed to port 8000 on http://localhost:8000/
 
 ```shell
-    uvicorn main:app --reload
+    python main.py
 ```
 
-Testing
+### Testing
 
-Run tests.
+Running tests.
 
 ```shell
     pytest
 ```
 
-
-
-
-Usage
+### Usage
 
 Open the API documentation in your browser by visiting http://localhost:8000/docs.
 
