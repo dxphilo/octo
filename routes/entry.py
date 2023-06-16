@@ -9,8 +9,13 @@ from config.config import settings
 import httpx
 from auth.auth import decode_jwt
 
+# Create a database session
 db = SessionLocal()
+
+# Create an API router
 router = APIRouter()
+
+# Define the OAuth2 password bearer scheme
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 
 # Utility function to get user from token
@@ -20,6 +25,7 @@ async def get_user_from_token(token: str):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token")
     return user_from_token
 
+# Endpoint for saving entries
 @router.post('/user/entries/', response_model=ResEntry, status_code=status.HTTP_201_CREATED)
 async def save_entries(entry: NewEntry, token: str = Depends(oauth2_scheme)):
     try:
@@ -60,7 +66,7 @@ async def save_entries(entry: NewEntry, token: str = Depends(oauth2_scheme)):
     except:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
+# Endpoint for retrieving entries
 @router.get('/user/entries/', response_model=List[ResEntry], status_code=status.HTTP_200_OK)
 async def get_entries(
     page: int = Query(1, ge=1),
@@ -83,7 +89,7 @@ async def get_entries(
     except:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
+# Endpoint for updating an entry
 @router.put('/user/entries/{entry_id}/', response_model=ResEntry, status_code=status.HTTP_200_OK)
 async def update_entries(entry_id: int, entry: ResEntry, token: str = Depends(oauth2_scheme)):
     try:
@@ -105,7 +111,7 @@ async def update_entries(entry_id: int, entry: ResEntry, token: str = Depends(oa
     except:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
+# Endpoint for deleting an entry
 @router.delete('/user/entries/{entry_id}/', response_model=ResEntry, status_code=status.HTTP_200_OK)
 async def delete_an_entry(entry_id: int, token: str = Depends(oauth2_scheme)):
     try:
@@ -124,4 +130,5 @@ async def delete_an_entry(entry_id: int, token: str = Depends(oauth2_scheme)):
     except:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+# Export the router
 entry_routes = router

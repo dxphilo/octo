@@ -1,4 +1,5 @@
 from argon2 import PasswordHasher
+#chose argon2 for improvied resitance against various password attacks as opposed to bcrypt
 
 ph = PasswordHasher()
 
