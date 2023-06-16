@@ -58,9 +58,30 @@ Application will be exposed to port 8000 on http://localhost:8000/
 
 Running tests.
 
+will run all test suites
 ```shell
     pytest
 ```
+
+You can run specific test file, i,e
+
+To run entry specific tests
+
+```shell
+  pytest -k test_entry_api.py     
+```
+
+To run user specific tests
+
+```shell
+  pytest -k test_user_api.py   
+```  
+
+To run utility specific tests
+
+```shell
+  pytest -k test_helpers.py   
+```  
 
 ### Usage
 
