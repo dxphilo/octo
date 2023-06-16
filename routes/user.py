@@ -1,4 +1,4 @@
-from fastapi import status,HTTPException, APIRouter,Depends
+from fastapi import status,HTTPException, APIRouter,Depends,Query
 from fastapi.security import OAuth2PasswordBearer
 from database.database import SessionLocal
 from models.models import User
@@ -56,16 +56,21 @@ async def login_a_user(login: Login):
 
 
 @router.get('/users/',response_model=List[ResUser] ,status_code=200)
-async def get_users(token: str = Depends(oauth2_scheme)):
+async def get_users(
+    page: int = Query(1, ge=1),
+    per_page: int = Query(10, ge=1, le=100),
+    token: str = Depends(oauth2_scheme)
+):
     try:
         user_from_token = await get_user_from_token(token)
         role = Role(user_from_token['role'])
         user_email = user_from_token['user_email']
+        offset = (page - 1) * per_page
 
         if role == Role.ADMIN:
-            user_entries = db.query(User).all()
+            user_entries = db.query(User).offset(offset).limit(per_page).all()
         elif role == Role.MANAGER:
-            user_entries = db.query(User).filter(User.role == Role.USER).all()
+            user_entries = db.query(User).filter(User.role == Role.USER).offset(offset).limit(per_page).all()
         elif role == Role.USER:
             user_entries = db.query(User).filter(User.email == user_email).first()
         else:

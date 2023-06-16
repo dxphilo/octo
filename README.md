@@ -26,8 +26,6 @@ FastAPI
     git clone https://github.com/dxphilo/octo.git
 ```
 
-Install the required dependencies.
-
 ENV Setup
 
 Create a file named .env in the root directory of your project.
@@ -37,11 +35,12 @@ Create a file named .env in the root directory of your project.
 ```
 
 
+Install the required dependencies.
 
 ```shell
     pip install -r requirements.txt
 ```
-Set up the database.
+Set up the database with sqlite.
 
 ```shell
     python create_db.py
@@ -220,8 +219,6 @@ The following endpoints are available in the API:
   - `Authorization` (string): JWT access token (required)
 - **Response**:
   - `message` (string): Deletion success message
-
-
 
 
 
