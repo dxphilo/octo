@@ -75,7 +75,7 @@ The following endpoints are available in the API:
 Send token in the form: 
 
 ```ssh
-  Authorization: Bearer <token>
+  Authorization: Bearer <your-token-here>
 ```
 
 ### 1. Create a User
