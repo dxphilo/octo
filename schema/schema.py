@@ -80,4 +80,5 @@ class ResEntry(BaseModel):
 
 
 class DeletionSuccess(BaseModel):
+    status: str = "Success"
     message: str = "User deleted successfully."
