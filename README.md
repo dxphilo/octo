@@ -20,13 +20,13 @@ FastAPI
 
 ## Installation and Setup
 
-### Clone the repository.
+#### Clone the repository.
 
 ```shell
     git clone https://github.com/dxphilo/octo.git
 ```
 
-### ENV Setup
+#### ENV Setup
 
 Create a file named .env in the root directory of your project.
 
@@ -35,18 +35,18 @@ Create a file named .env in the root directory of your project.
 ```
 
 
-### Install the required dependencies.
+#### Install the required dependencies.
 
 ```shell
     pip install -r requirements.txt
 ```
-### Set up the database with sqlite.
+#### Set up the database with sqlite.
 
 ```shell
     python create_db.py
 ```
 
-### Run the application.
+#### Run the application.
 
 Application will be exposed to port 8000 on http://localhost:8000/
 
@@ -54,7 +54,7 @@ Application will be exposed to port 8000 on http://localhost:8000/
     python main.py
 ```
 
-### Testing
+#### Testing
 
 Running tests.
 
