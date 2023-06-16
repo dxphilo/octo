@@ -72,7 +72,11 @@ Open the API documentation in your browser by visiting http://localhost:8000/doc
 
 The following endpoints are available in the API:
 
-Send token in the form: Authorization: Bearer <token>
+Send token in the form: 
+
+```ssh
+  Authorization: Bearer <token>
+```
 
 ### 1. Create a User
 
