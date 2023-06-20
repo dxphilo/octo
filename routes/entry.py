@@ -115,12 +115,13 @@ async def delete_an_entry(entry_id: int, token: str = Depends(oauth2_scheme)):
     try:
         user_from_token = await get_user_from_token(token)
         role = Role(user_from_token['role'])
+        user =user_from_token['user_id']
         entry_to_delete = db.query(Entry).filter(Entry.id == entry_id).first()
 
         if entry_to_delete is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Entry with the given id {entry_id} is not found")
 
-        if role == Role.USER or role == Role.ADMIN:
+        if role == Role.USER and user == entry_to_delete.user or role == Role.ADMIN:
             db.delete(entry_to_delete)
             db.commit()
 
