@@ -7,7 +7,7 @@ client = TestClient(app)
 @pytest.fixture
 def authorization_headers():
     return {
-        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiVGVzdCBDaGl6aSIsInVzZXJfZW1haWwiOiJjaGl6aUBnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJleHBpcmVzIjoxNjg2OTc0NzMxLjY3MjM0NTJ9.wA3hQOFR3xgLcBjPXnJQqp-coz_z7UOrciA_hncW_ks"
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiVGVzdCBDaGl6aSIsInVzZXJfZW1haWwiOiJjaGl6aUBnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJleHBpcmVzIjoxNjg3MzkzODA4LjkyMjcwM30.86de3iJiSQ51KbMkGKOEzypoWxeAjHpVP_GLxG0ols8"
     }
 
 
@@ -15,7 +15,7 @@ def authorization_headers():
 def sign_up_info():
     return {
         "fullname": "Test Chizi",
-        "email": "tetchizi@gmail.com",
+        "email": "tetchizik@gmail.com",
         "password": "ChiziKarogwaTena",
         "role": "admin"
     }
@@ -62,8 +62,8 @@ def test_get_users(authorization_headers):
 
 # this test will fail is the user with the id is not found in the database
 def test_update_users(authorization_headers, sample_update_payload):
-    user_id = 9 # this could be any user id existing in the database
-    response = client.patch(f'/users/{user_id}', headers=authorization_headers, json=sample_update_payload)
+    user_id = 1 # this could be any user id existing in the database
+    response = client.put(f'/users/{user_id}', headers=authorization_headers, json=sample_update_payload)
     assert response.status_code == 200
 
     expected_elements = {
@@ -80,7 +80,7 @@ def test_update_users(authorization_headers, sample_update_payload):
 
 # this test will fail is the user with the user_id is not found in the database
 def test_delete_user(authorization_headers):
-    user_id = 13 # this could be any user id existing in the database
+    user_id = 1 # this could be any user id existing in the database
     response = client.delete(f'/users/{user_id}', headers=authorization_headers)
     assert response.status_code == 200
-    assert response.json() == {"message": "User deleted successfully."}
+    assert response.json() == {"status": "Success", "message": "User deleted successfully."}
