@@ -126,18 +126,23 @@ async def update_user_details(
             or (role == Role.MANAGER and user_entry_to_update.role == Role.USER)
             or (role == Role.USER and user_entry_to_update.email == user_email)
         ):
-            # TODO: Implement email existence check in the database
-            # Update the user's details
-            hashed_password = await hash_password(new_entry.password)
-            
-            user_entry_to_update.fullname = new_entry.fullname
-            user_entry_to_update.email = new_entry.email
-            user_entry_to_update.password = hashed_password
-            user_entry_to_update.date = datetime.now().strftime("%Y-%m-%d")
-            user_entry_to_update.time = datetime.now().strftime("%H:%M:%S")
-            user_entry_to_update.role = new_entry.role
+            # email existence check in the database
+            is_email_in_db = db.query(User).filter(User.email == new_entry.email).first()
+            if is_email_in_db and is_email_in_db.email == new_entry.email:
+                # Update the user's details
+                hashed_password = await hash_password(new_entry.password)
+                
+                user_entry_to_update.fullname = new_entry.fullname
+                user_entry_to_update.email = new_entry.email
+                user_entry_to_update.password = hashed_password
+                user_entry_to_update.date = datetime.now().strftime("%Y-%m-%d")
+                user_entry_to_update.time = datetime.now().strftime("%H:%M:%S")
+                user_entry_to_update.role = new_entry.role
 
-            db.commit()
+                db.commit()
+            else:
+                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Email already registered by a different user")
+
 
         else:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient privileges")
