@@ -1,5 +1,5 @@
 # FastAPI Application
-FastAPI
+FastAPI. Article Guide [here](https://python.plainenglish.io/building-a-restful-api-with-fastapi-secure-signup-and-login-functionality-included-45cdbcb36106)
 ## Features
 
 - User Registration: Users can create an account.
